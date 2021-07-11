@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	_ "net/http/pprof"
 )
 
 func main() {
