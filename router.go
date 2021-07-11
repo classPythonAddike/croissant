@@ -5,23 +5,38 @@ import (
 	"net/http"
 )
 
-func HelloWorld() {
-	fmt.Println("Hello, World")
-}
-
 type Router struct {
 	Routes map[string]Route
 }
 
-func (r *Router) InitRoutes(NumRoutes int) {
+func NewRouter(NumRoutes int) Router {
+	r := Router{}
 	r.Routes = make(map[string]Route, NumRoutes)
+	return r
 }
 
 func (r *Router) AddRoute(route Route) {
-	http.HandleFunc(route.Path, route.RequestHandler)
+
+	var isValid bool
+
+	for _, paramType := range route.Expects {
+		isValid = false
+		for validType, _ := range ValidTypes {
+			if paramType == validType {
+				isValid = true
+				break
+			}
+		}
+
+		if !isValid {
+			panic(fmt.Sprintf("Unsupported type for form body expectation - %v", paramType))
+		}
+	}
+
+	http.HandleFunc(route.Path, route.requestHandler)
 	r.Routes[route.Path] = route
 }
 
-func (r *Router) Serve() {
-	http.ListenAndServe(":8080", nil)
+func (r *Router) Serve(host string) {
+	http.ListenAndServe(host, nil)
 }

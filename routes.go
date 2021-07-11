@@ -3,26 +3,37 @@ package croissant
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"net/url"
 )
 
+type Request http.Request
+type FormBody url.Values
+
 type Route struct {
-	Path   string
-	Get    func(http.ResponseWriter, *http.Request) Response
-	Post   func(http.ResponseWriter, *http.Request) Response
-	Delete func(http.ResponseWriter, *http.Request) Response
-	Patch  func(http.ResponseWriter, *http.Request) Response
+	Path    string
+	Expects map[string]string
+
+	Get    func(*Request, FormBody) Response
+	Post   func(*Request, FormBody) Response
+	Delete func(*Request, FormBody) Response
+	Patch  func(*Request, FormBody) Response
 }
 
-func WriteResponse(
-	handler func(http.ResponseWriter, *http.Request) Response,
+func writeResponse(
+	method string,
+	r *Route,
+	handler func(*Request, FormBody) Response,
+	body FormBody,
 	w http.ResponseWriter,
-	resp *http.Request,
+	resp Request,
 ) {
 
-	var response Response = handler(w, resp)
+	var response Response = handler(&resp, body)
 
 	w.WriteHeader(response.StatusCode)
+	log.Printf("%v - %v returned %v", method, r.Path, response.StatusCode)
 
 	if response.Html != "" {
 		fmt.Fprint(w, response.Html)
@@ -31,35 +42,33 @@ func WriteResponse(
 	}
 }
 
-func (r *Route) RequestHandler(w http.ResponseWriter, resp *http.Request) {
-	var method string = resp.Method
+func (r *Route) requestHandler(w http.ResponseWriter, rawReq *http.Request) {
+	req := Request(*rawReq)
+	var method string = req.Method
 
-	switch {
+	rawReq.ParseForm()
 
-	case (method == "GET" || method == ""):
-		if r.Get != nil {
-			WriteResponse(r.Get, w, resp)
-		} else {
-			w.WriteHeader(405)
+	for param, paramType := range r.Expects {
+		valid := ValidTypes[paramType](rawReq.FormValue(param))
+		if !valid {
+			w.WriteHeader(400)
+			log.Printf("%v - %v returned %v", method, r.Path, 400)
+			return
 		}
+	}
 
-	case method == "POST":
-		if r.Post != nil {
-			WriteResponse(r.Post, w, resp)
-		} else {
-			w.WriteHeader(405)
-		}
-	case method == "DELETE":
-		if r.Delete != nil {
-			WriteResponse(r.Delete, w, resp)
-		} else {
-			w.WriteHeader(405)
-		}
-	case method == "PATCH":
-		if r.Patch != nil {
-			WriteResponse(r.Patch, w, resp)
-		} else {
-			w.WriteHeader(405)
-		}
+	methodMap := map[string](func(*Request, FormBody) Response){
+		"GET":    r.Get,
+		"":       r.Get,
+		"POST":   r.Post,
+		"PATCH":  r.Patch,
+		"DELETE": r.Delete,
+	}
+
+	if methodMap[method] != nil {
+		writeResponse(method, r, methodMap[method], FormBody(rawReq.Form), w, req)
+	} else {
+		w.WriteHeader(405)
+		log.Printf("%v - %v returned %v", method, r.Path, 405)
 	}
 }
