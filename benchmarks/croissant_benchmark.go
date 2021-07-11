@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"strconv"
 
 	"github.com/classPythonAddike/croissant"
 )
@@ -21,17 +21,16 @@ func TestCroissant() {
 }
 
 func GetHomePage(r *croissant.Request, body croissant.FormBody) croissant.Response {
-	num := rand.Intn(100)
+	num, _ := strconv.Atoi(body["integer"][0])
 
 	if num%2 != 0 {
 		return croissant.Response{
 			Html:       fmt.Sprintf("Odd number, error ocurred - %v", num),
-			StatusCode: 200,
+			StatusCode: 405,
 		}
 	}
 
 	return croissant.Response{
-		Html:       fmt.Sprintf("<h1>Even Number - %v</h1>", num),
-		StatusCode: 200,
+		Html: fmt.Sprintf("<h1>Even Number - %v</h1>", num),
 	}
 }

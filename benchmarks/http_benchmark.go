@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
+	"strconv"
 )
 
 func TestHttp() {
@@ -12,10 +12,17 @@ func TestHttp() {
 }
 
 func GetResponse(w http.ResponseWriter, r *http.Request) {
-	num := rand.Intn(100)
+	r.ParseForm()
+
+	num, err := strconv.Atoi(r.Form.Get("integer"))
+
+	if err != nil {
+		fmt.Fprint(w, "Invalid type for form parameter integer - expected int!")
+		return
+	}
 
 	if num%2 != 0 {
-		w.WriteHeader(500)
+		w.WriteHeader(200)
 		fmt.Fprint(w, fmt.Sprintf("Error - Odd number given - %v", num))
 	} else {
 		w.WriteHeader(200)

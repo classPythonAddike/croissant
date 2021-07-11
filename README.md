@@ -4,13 +4,17 @@ A fast, easy to use Rest API Framework implemented in Golang
 
 Croissant was inspired by [FastAPI](https://fastapi.tiangolo.com/). It aims to implement FastAPI features such as Request Body Parsing, Built in Documentation Handling, and lastly, (but definitely not the least) less code required.
 
-# Performance
+## Goals for the Project
+
+I am aiming for > 90% test coverage of Croissant's source code. In addition to this, I also want Croissant to be completely type safe.
+
+## Performance
 
 Croissant's performance is on par with API's created with Golang's standard lib - `net/http`. This is because, as of now, it is just a simple wrapper around the library. It is likely to decrease in speed once more features are added, and I will definitely try to reduce the impact.
 
 You can see the programs used for comparison in the [benchmarks directory](/benchmarks).
 
-# Code Length
+## Code Length
 
 My primary goal for Croissant is to reduce the code needed for API's written in Golang.
 
@@ -22,5 +26,5 @@ My primary goal for Croissant is to reduce the code needed for API's written in 
 
 | Framework | Code Length  | Time |
 |-----------|--------------|------|
-| Croissant | 1	           | 33   |
-| net/http  | 0.7          | 30   |
+| Croissant | 1	           | 40   |
+| net/http  | 0.8          | 35   |
