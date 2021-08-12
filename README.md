@@ -1,4 +1,16 @@
-# Croissant
+<h1 align=center>Croissant</h1>
+
+<div align=center>
+  <img src="https://img.shields.io/github/languages/top/classPythonAddike/croissant">
+  <img src="https://pkg.go.dev/badge/pkg.go.dev/github.com/classPythonAddike/croissant.svg">
+  <!--[![codecov](https://codecov.io/gh/classPythonAddike/croissant/branch/master/graph/badge.svg)](https://codecov.io/gh/classPythonAddike/croissant)-->
+  <img src="https://goreportcard.com/badge/github.com/classPythonAddike/croissant">
+  <img src="https://sourcegraph.com/github.com/classPythonAddike/croissant/-/badge.svg">
+  <img src="https://www.codetriage.com/classpythonaddike/croissant/badges/users.svg">
+  <img src="https://img.shields.io/github/license/classPythonAddike/croissant?style=flat">
+</div>
+
+<br>
 
 A fast, easy to use Rest API Framework implemented in Golang
 
